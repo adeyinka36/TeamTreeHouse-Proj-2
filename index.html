@@ -8,13 +8,14 @@
     <link rel="stylesheet" href="css/design.css">
   </head>
   <body id="doc-body">
-    <div class="page">
+    <div class="page" >
       <div class="page-header cf">
         <h2>Students</h2>
         <!-- dynamically insert search form here (optional) -->
+        <input type="text" placeholder="search" id="search_box">
 
       </div>
-      <ul class="student-list">
+      <ul class="student-list" id="student-list">
         <li class="student-item cf">
             <div class="student-details">
                 <img class="avatar" src="https://randomuser.me/api/portraits/thumb/women/67.jpg">
@@ -555,6 +556,7 @@
                    <span class="date">Joined 05/14/13</span>
            </div>
         </li>
+        <h2 id="sorry-element">Sorry user not found</h2 class>
       </ul>
       <!-- dynamically add pagination links here -->
       <div id="pagination-div">

@@ -131,3 +131,13 @@ body{
       padding:5px;
       margin-top:10px;
     }
+    #search_box{
+      float:right;
+      margin-right:5px;
+      border-radius:3px;
+      height:20px;
+    }
+    #sorry-element{
+      display:none;
+      font-size: 3rem;
+    }

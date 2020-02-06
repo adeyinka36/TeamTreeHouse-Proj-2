@@ -1,92 +1,90 @@
-/******************************************
-Treehouse Techdegree:
-FSJS project 2 - List Filter and Pagination
-******************************************/
-   
-// Study guide for this project - https://drive.google.com/file/d/1OD1diUsTMdpfMDv677TfL1xO2CEkykSz/view?usp=sharing
-
-
-/*** 
-   Add your global variables that store the DOM elements you will 
-   need to reference and/or manipulate. 
-   
-   But be mindful of which variables should be global and which 
-   should be locally scoped to one of the two main functions you're 
-   going to create. A good general rule of thumb is if the variable 
-   will only be used inside of a function, then it can be locally 
-   scoped to that function.
-***/
-
-
-
-
-/*** 
-   Create the `showPage` function to hide all of the items in the 
-   list except for the ten you want to show.
-
-   Pro Tips: 
-     - Keep in mind that with a list of 54 students, the last page 
-       will only display four.
-     - Remember that the first student has an index of 0.
-     - Remember that a function `parameter` goes in the parens when 
-       you initially define the function, and it acts as a variable 
-       or a placeholder to represent the actual function `argument` 
-       that will be passed into the parens later when you call or 
-       "invoke" the function 
-***/
-
-
-
-
-/*** 
-   Create the `appendPageLinks function` to generate, append, and add 
-   functionality to the pagination buttons.
-***/
-
-
-
-
-
-// Remember to delete the comments that came with this file, and replace them with your own code comments.
-
-// Here i store the list of students using the classname
+// Here i store the list of students using the classname and select the necessary elements 
 const list =document.getElementsByClassName("student-item");
 const pagination_div =document.getElementById("pagination-div");
 const body=document.getElementById("doc-body");
 body.addEventListener("load",elementCreator())
+const search_box=document.getElementById("search_box");
+const studentList=document.getElementById("student-list")
+const sorry=document.getElementById("sorry-element");
 
-// function that creates element with ID of number
-function elementCreator(){
-   firstPage()
-   let elementList=[]
-   let pageNumbers=Math.ceil(list.length/10)
-   for(i=0;i<pageNumbers;i++){
-      // create element and give ID of page number 
-      let P_element=document.createElement("p")
-      P_element.className="pagination-links";
-      P_element.id=i+1;
-      P_element.innerText=i+1;
-      pagination_div.appendChild(P_element);
-      elementList.push(P_element);
-      P_element.addEventListener("click",()=>{
-         displaySelectedStudents(parseInt(P_element.id))
-      })
-   }
-   // for(i=0;i<elementList.length;i++){
-   //    elementList[i].addEventListener("click",()=>{
-   //       displaySelectedStudents(i+1)
-   //    })
-   // }
-}
+search_box.addEventListener("keyup",search)
 
-function firstPage(){
+// This is the function for the search-box
+function search(e){
+   let searchResult =[]
+   let regex= new RegExp("^"+search_box.value);
    for(i=0;i<list.length;i++){
-      list[i].style.display="none"
+      if(list[i].firstElementChild.firstElementChild.nextElementSibling.innerText.toUpperCase().split(" ").join("").indexOf(search_box.value.toUpperCase())>-1){
+         console.log(list[i].firstElementChild.firstElementChild.nextElementSibling.innerText)
+         searchResult.push(list[i])
+      }
    }
-   for(i=0;i<=9;i++){
-      list[i].style.display="block"
+   if(searchResult.length==0){
+      for(i=0;i<list.length;i++){
+               list[i].style.display="none"
+            }
+            while(pagination_div.firstChild){
+               pagination_div.removeChild(pagination_div.firstChild)
+            }
+      sorry.style.display="block"
+   
+            
+   }
+   else if(searchResult.length>0 && searchResult.length<=10){
+      sorry.style.display="none"
+      for(i=0;i<list.length;i++){
+         list[i].style.display="none"
+      }
+      while(pagination_div.firstChild){
+         pagination_div.removeChild(pagination_div.firstChild)
+      }
+      for(i=0;i<searchResult.length;i++){
+         searchResult[i].style.display="block"
+      }
+     
+   }
+   else{
+      console.log("else is running")
+      sorry.style.display="none"
+         while(pagination_div.firstChild){
+            pagination_div.removeChild(pagination_div.firstChild)
+         }
+         let pageNumbers=Math.ceil(searchResult.length/10)
+   
+         for(i=0;i<pageNumbers;i++){
+            
+            // create element and give ID of page number 
+            let P_element=document.createElement("p")
+            P_element.className="pagination-links";
+            P_element.innerText=i+1;
+            pagination_div.appendChild(P_element);
+            P_element.id=i+1;
+            elementId=P_element.id
+            let itemsPerPage = 10
+            let startIndex = (P_element.id* itemsPerPage) - itemsPerPage
+            let endIndex = P_element.id* itemsPerPage
+            console.log(searchResult)
+            for(x=0;x<10;x++){
+               searchResult[x].style.display="block"
+            }
+            P_element.addEventListener("click",(e)=>{
+               for(i=0;i<list.length;i++){
+                  list[i].style.display="none"
+               }
+               for(i=startIndex;i<endIndex;i++){
+               if(searchResult[i]!=undefined){
+            searchResult[i].style.display="block"
+               }
+            }
+            
+            })
+              
+            
+         
+      }
    }
 }
+
 
 // This function hides all students then shows selected ones
 function displaySelectedStudents(page){
@@ -98,8 +96,36 @@ let startIndex = (page * itemsPerPage) - itemsPerPage
 let endIndex = page * itemsPerPage
  
 for(i=startIndex;i<endIndex;i++){
-  list[i].style.display="block"
+   if(list[i]!=undefined){
+  list[i].style.display="block"}
 }
 }
 
-// Create a function that makes a new page link button for every group of 10 student
+// this is a function that loads the first ten studets onces the document loads
+function firstPage(){
+   for(i=0;i<list.length;i++){
+      list[i].style.display="none"
+   }
+   for(i=0;i<=9;i++){
+      list[i].style.display="block"
+   }
+}
+// 
+
+// this is a function that creates the links for the pages
+function elementCreator(){
+   firstPage()
+   let pageNumbers=Math.ceil(list.length/10)
+   for(i=0;i<pageNumbers;i++){
+      // create element and give ID of page number 
+      let P_element=document.createElement("p")
+      P_element.className="pagination-links";
+      P_element.id=i+1;
+      P_element.innerText=i+1;
+      pagination_div.appendChild(P_element);
+      P_element.addEventListener("click",()=>{
+         displaySelectedStudents(parseInt(P_element.id))
+      })
+   }
+}
+
