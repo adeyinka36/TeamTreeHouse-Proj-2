@@ -7,7 +7,14 @@ const search_box = document.getElementById("search_box");
 const studentList = document.getElementById("student-list")
 const sorry = document.getElementById("sorry-element");
 search_box.addEventListener("keyup", search)
+search_box.addEventListener("keypress",submitByPressingEnter)
 // This function hides all students then shows selected ones
+
+function submitByPressingEnter(e){
+  if(e.keyCode==13){
+     search()
+  }
+}
 function displaySelectedStudents(page) {
 	for (i = 0; i < list.length; i++) {
 		list[i].style.display = "none"
