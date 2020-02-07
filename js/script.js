@@ -1,116 +1,103 @@
-// Here i store the list of students using the classname and select the necessary elements 
+// Here i store lists of studens and other necessary elements
 const list = document.getElementsByClassName("student-item");
-const pagination_div = document.getElementById("pagination-div");
 const body = document.getElementById("doc-body");
-body.addEventListener("load", elementCreator())
-const search_box = document.getElementById("search_box");
-const studentList = document.getElementById("student-list")
-const sorry = document.getElementById("sorry-element");
-search_box.addEventListener("keyup", search)
-search_box.addEventListener("keypress",submitByPressingEnter)
-// This function hides all students then shows selected ones
+const containerPage = document.getElementsByClassName("page")
 
-function submitByPressingEnter(e){
-  if(e.keyCode==13){
-     search()
-  }
+body.addEventListener("load", createPaginationLinks(list))
+const searh_box = document.getElementById("searh_box");
+
+// I add the search features here 
+search_box.addEventListener("keyup", search)
+search_box.addEventListener("keypress", submitEnter)
+
+function submitEnter(e) {
+    if (e.keyCode == 13) {
+        search()
+    }
 }
-function displaySelectedStudents(page) {
-	for (i = 0; i < list.length; i++) {
-		list[i].style.display = "none"
-	}
-	let itemsPerPage = 10
-	let startIndex = (page * itemsPerPage) - itemsPerPage
-	let endIndex = page * itemsPerPage
-	for (i = startIndex; i < endIndex; i++) {
-		if (list[i] != undefined) {
-			list[i].style.display = "block"
-		}
-	}
-}
-// this is a function that loads the first ten studets onces the document loads
-function firstPage() {
-	for (i = 0; i < list.length; i++) {
-		list[i].style.display = "none"
-	}
-	for (i = 0; i <= 9; i++) {
-		list[i].style.display = "block"
-	}
-}
-// 
-// this is a function that creates the links for the pages
-function elementCreator() {
-	firstPage()
-	let pageNumbers = Math.ceil(list.length / 10)
-	for (i = 0; i < pageNumbers; i++) {
-		// create element and give ID of page number 
-		let P_element = document.createElement("p")
-		P_element.className = "pagination-links";
-		P_element.id = i + 1;
-		P_element.innerText = i + 1;
-		pagination_div.appendChild(P_element);
-		P_element.addEventListener("click", () => {
-			displaySelectedStudents(parseInt(P_element.id))
-		})
-	}
-}
-// This is the function for the search-box
+// this function is called by search  event
 function search(e) {
-	let searchResult = []
-	for (i = 0; i < list.length; i++) {
-		if (list[i].firstElementChild.firstElementChild.nextElementSibling.innerText.toUpperCase().split(" ").join("").indexOf(search_box.value.toUpperCase()) > -1) {
-			searchResult.push(list[i])
-		}
-	}
-	if (searchResult.length == 0) {
-		for (i = 0; i < list.length; i++) {
-			list[i].style.display = "none"
-		}
-		while (pagination_div.firstChild) {
-			pagination_div.removeChild(pagination_div.firstChild)
-		}
-		sorry.style.display = "block"
-	} else if (searchResult.length > 0 && searchResult.length <= 10) {
-		sorry.style.display = "none"
-		for (i = 0; i < list.length; i++) {
-			list[i].style.display = "none"
-		}
-		while (pagination_div.firstChild) {
-			pagination_div.removeChild(pagination_div.firstChild)
-		}
-		for (i = 0; i < searchResult.length; i++) {
-			searchResult[i].style.display = "block"
-		}
-	} else {
-		sorry.style.display = "none"
-		while (pagination_div.firstChild) {
-			pagination_div.removeChild(pagination_div.firstChild)
-		}
-		let pageNumbers = Math.ceil(searchResult.length / 10)
-		for (i = 0; i < pageNumbers; i++) {
-			// create element and give it an  ID of page number 
-			let P_element = document.createElement("p")
-			P_element.className = "pagination-links";
-			P_element.innerText = i + 1;
-			pagination_div.appendChild(P_element);
-			P_element.id = i + 1;
-			elementId = P_element.id
-			let itemsPerPage = 10
-			let startIndex = (P_element.id * itemsPerPage) - itemsPerPage
-			let endIndex = P_element.id * itemsPerPage
-			for (x = 0; x < 10; x++) {
-				searchResult[x].style.display = "block"
-			}
-			P_element.addEventListener("click", (e) => {
-				for (i = 0; i < list.length; i++) {
-					list[i].style.display = "none"
-				}
-				for (i = startIndex; i < endIndex; i++) {
-					if (searchResult[i] != undefined) {
-						searchResult[i].style.display = "block"
-					}
-				}
-			})
-		}
-	}
+    let searchResult = []
+    for (i = 0; i < list.length; i++) {
+        if (list[i].firstElementChild.firstElementChild.nextElementSibling.innerText.toUpperCase().split(" ").join("").indexOf(search_box.value.toUpperCase()) > -1) {
+            searchResult.push(list[i])
+        }
+    }
+
+    if (searchResult.length < 1) {
+
+        showPages(searchResult, 0)
+        if (containerPage[0].lastElementChild.tagName == "DIV") {
+            containerPage[0].lastElementChild.remove()
+        }
+
+        let notFound = document.createElement("h2")
+        notFound.innerText = "Sorry student not found"
+        if (containerPage[0].lastElementChild.tagName != "H2") {
+            containerPage[0].appendChild(notFound)
+        }
+    } else {
+        createPaginationLinks(searchResult)
+    }
+
+}
+
+
+
+// this function removes all students and renders the appropraite ones
+function showPages(listParameter, pageClicked) {
+    // remove all studets 
+    for (i = 0; i < list.length; i++) {
+        list[i].style.display = "none"
+    }
+
+    // display appropraite students
+    let startIndex = (pageClicked * 10) - 10
+    let endIndex = pageClicked * 10
+    for (i = startIndex; i < endIndex; i++) {
+        if (listParameter[i] != undefined) {
+            listParameter[i].style.display = "block"
+        }
+    }
+}
+
+// this function dynamically generates and removes links 
+function createPaginationLinks(currentList) {
+    if (containerPage[0].lastElementChild.tagName == "DIV" || containerPage[0].lastElementChild.tagName == "H2") {
+        containerPage[0].lastElementChild.remove()
+    }
+    showPages(currentList, 1)
+    let numberOfPages = Math.ceil(currentList.length / 10)
+    let newDiv = document.createElement("div")
+    newDiv.className = "pagination";
+    let ul = document.createElement("ul")
+    newDiv.appendChild(ul)
+        // check if page is correct
+    containerPage[0].appendChild(newDiv)
+
+    for (i = 0; i < numberOfPages; i++) {
+        let newA = document.createElement("a")
+        if (i == 0) {
+            newA.className = "active"
+        }
+        newA.addEventListener("click", (e) => {
+            let listOfElementsToDeactivate = document.getElementsByTagName("A")
+            for (i = 0; i < listOfElementsToDeactivate.length; i++) {
+                listOfElementsToDeactivate[i].classList.remove("active")
+            }
+            e.target.className = "active"
+                //  call function to render correct page after click
+            showPages(currentList, e.target.innerText)
+        })
+
+        newA.href = `#`
+        let li = document.createElement("li");
+        li.appendChild(newA)
+        li.id = i + 1
+        newA.innerText = i + 1
+        ul.appendChild(li)
+
+
+
+    }
 }
